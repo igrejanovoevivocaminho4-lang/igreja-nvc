@@ -4,6 +4,13 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Igreja Novo e Vivo Caminho — Cadastro de Membros</title>
+<meta name="description" content="Sistema de cadastro de membros da Igreja Novo e Vivo Caminho">
+<meta name="theme-color" content="#1a237e">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Igreja NVC">
+<link rel="manifest" href="manifest.json">
 <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700;900&family=Open+Sans:wght@400;500;600&display=swap" rel="stylesheet">
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
@@ -677,6 +684,15 @@ const FIREBASE_DEFAULT = {
   const cfg = loadConfig() || FIREBASE_DEFAULT;
   if(cfg && cfg.apiKey){ await connectFirebase(cfg); }
 })();
+</script>
+<script>
+if('serviceWorker' in navigator){
+  window.addEventListener('load', ()=>{
+    navigator.serviceWorker.register('sw.js')
+      .then(()=>console.log('SW registrado'))
+      .catch(e=>console.log('SW erro:',e));
+  });
+}
 </script>
 </body>
 </html>
