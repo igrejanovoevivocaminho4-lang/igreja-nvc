@@ -1,0 +1,682 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Igreja Novo e Vivo Caminho — Cadastro de Membros</title>
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700;900&family=Open+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Open Sans',sans-serif;background:#f0f4ff;min-height:100vh;color:#1a237e}
+:root{
+  --azul-esc:#1a237e;--azul-med:#1565c0;--azul-clar:#29b6f6;
+  --grad:linear-gradient(135deg,#1a237e 0%,#1565c0 55%,#29b6f6 100%);
+  --branco:#ffffff;--cinza-f:#f0f4ff;
+  --sombra:0 4px 24px rgba(26,35,126,.13);--sombra2:0 2px 10px rgba(26,35,126,.10);
+}
+.page{max-width:520px;margin:0 auto;padding:1.5rem 1rem 3rem}
+.header{background:var(--grad);border-radius:20px;padding:2rem 1.5rem 1.6rem;margin-bottom:1.5rem;text-align:center;position:relative;overflow:hidden;box-shadow:var(--sombra)}
+.header::before{content:'';position:absolute;top:-40px;right:-40px;width:180px;height:180px;border-radius:50%;background:rgba(255,255,255,.06)}
+.header::after{content:'';position:absolute;bottom:-50px;left:-20px;width:160px;height:160px;border-radius:50%;background:rgba(255,255,255,.04)}
+.header-logo{width:80px;height:80px;object-fit:contain;filter:brightness(0) invert(1);margin-bottom:.8rem;position:relative;z-index:1}
+.header-logo-fallback{width:80px;height:80px;border-radius:50%;background:rgba(255,255,255,.15);border:2px solid rgba(255,255,255,.3);display:flex;align-items:center;justify-content:center;margin:0 auto .8rem;font-size:28px;color:#fff;font-weight:900;font-family:'Montserrat',sans-serif}
+.header h1{font-family:'Montserrat',sans-serif;font-size:11px;font-weight:700;color:rgba(255,255,255,.75);text-transform:uppercase;letter-spacing:2.5px;margin-bottom:.2rem;position:relative;z-index:1}
+.header h2{font-family:'Montserrat',sans-serif;font-size:22px;font-weight:900;color:#fff;text-transform:uppercase;line-height:1.1;position:relative;z-index:1}
+.header h2 span{display:block;font-size:14px;font-weight:600;color:rgba(255,255,255,.8);margin-top:.2rem;letter-spacing:1px}
+.header p{font-size:13px;color:rgba(255,255,255,.75);margin-top:.7rem;position:relative;z-index:1;line-height:1.5}
+.card{background:#fff;border-radius:16px;padding:1.6rem;box-shadow:var(--sombra);margin-bottom:1rem}
+.card-title{font-family:'Montserrat',sans-serif;font-size:13px;font-weight:700;color:var(--azul-med);text-transform:uppercase;letter-spacing:1px;margin-bottom:1.1rem;padding-bottom:.6rem;border-bottom:2px solid #e3eaf8;display:flex;align-items:center;gap:8px}
+.form-row{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px}
+.form-row.full{grid-template-columns:1fr}
+.form-group{display:flex;flex-direction:column;gap:4px}
+.form-group label{font-size:11px;color:#5c6bc0;font-weight:700;text-transform:uppercase;letter-spacing:.6px}
+.form-group input,.form-group select{font-size:14px;border:1.5px solid #c5cae9;border-radius:9px;padding:9px 12px;font-family:'Open Sans',sans-serif;outline:none;transition:border .2s,box-shadow .2s;background:#fff;color:#1a237e;width:100%}
+.form-group input:focus,.form-group select:focus{border-color:var(--azul-med);box-shadow:0 0 0 3px rgba(21,101,192,.1)}
+.form-group input::placeholder{color:#b0bec5;font-size:13px}
+.btn-enviar{width:100%;background:var(--grad);color:#fff;border:none;border-radius:10px;padding:14px;font-size:15px;font-family:'Montserrat',sans-serif;font-weight:700;cursor:pointer;box-shadow:0 4px 16px rgba(21,101,192,.35);transition:opacity .2s,transform .1s;text-transform:uppercase;letter-spacing:.5px;margin-top:.5rem}
+.btn-enviar:hover{opacity:.93}.btn-enviar:active{transform:scale(.98)}.btn-enviar:disabled{opacity:.6;cursor:not-allowed}
+.success{display:none;text-align:center;padding:2rem 1rem}
+.success-icon{width:64px;height:64px;border-radius:50%;background:var(--grad);display:flex;align-items:center;justify-content:center;margin:0 auto 1rem;box-shadow:var(--sombra);font-size:28px}
+.success h3{font-family:'Montserrat',sans-serif;font-size:18px;font-weight:700;color:var(--azul-esc);margin-bottom:.5rem}
+.success p{font-size:14px;color:#5c6bc0;line-height:1.6;margin-bottom:1.3rem}
+.btn-outro{background:#e8f0fe;color:var(--azul-med);border:1.5px solid #c5cae9;border-radius:9px;padding:10px 20px;font-size:13px;font-family:'Montserrat',sans-serif;font-weight:700;cursor:pointer}
+.admin-link{text-align:center;margin-top:1.5rem}
+.admin-link a{font-size:12px;color:#9fa8da;text-decoration:none;font-weight:600}
+.admin-link a:hover{color:var(--azul-med)}
+.admin-panel{display:none}
+.admin-header{background:var(--grad);border-radius:16px;padding:1.2rem 1.5rem;margin-bottom:1.2rem;display:flex;align-items:center;justify-content:space-between;box-shadow:var(--sombra)}
+.admin-header h2{font-family:'Montserrat',sans-serif;font-size:14px;font-weight:700;color:#fff}
+.admin-header p{font-size:11px;color:rgba(255,255,255,.75);margin-top:1px}
+.btn-sair{background:rgba(255,255,255,.15);color:#fff;border:1px solid rgba(255,255,255,.3);border-radius:7px;padding:5px 12px;font-size:12px;font-family:'Montserrat',sans-serif;font-weight:600;cursor:pointer}
+.stats-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:1.2rem}
+.stat{background:#fff;border-radius:12px;padding:10px 12px;text-align:center;box-shadow:var(--sombra2);border:1px solid #e3eaf8}
+.stat-val{font-family:'Montserrat',sans-serif;font-size:22px;font-weight:700;color:var(--azul-esc)}
+.stat-lbl{font-size:10px;color:#9fa8da;font-weight:700;text-transform:uppercase;letter-spacing:.5px;margin-top:1px}
+.tabs{display:flex;gap:6px;margin-bottom:1rem;flex-wrap:wrap}
+.tab{font-family:'Montserrat',sans-serif;font-size:12px;font-weight:700;padding:7px 14px;border-radius:20px;cursor:pointer;border:1.5px solid #c5cae9;color:#5c6bc0;background:#fff;transition:all .2s;text-transform:uppercase;letter-spacing:.5px}
+.tab.active{background:var(--grad);color:#fff;border-color:transparent;box-shadow:0 2px 10px rgba(21,101,192,.3)}
+.pending-badge{background:#fff;color:#1565c0;border-radius:20px;font-size:10px;padding:1px 6px;margin-left:4px;font-weight:700}
+.search-bar{display:flex;gap:8px;margin-bottom:1rem}
+.search-bar input{flex:1;font-size:13px;border:1.5px solid #c5cae9;border-radius:9px;padding:9px 12px;font-family:'Open Sans',sans-serif;outline:none;transition:border .2s}
+.search-bar input:focus{border-color:var(--azul-med)}
+.search-bar select{font-size:13px;border:1.5px solid #c5cae9;border-radius:9px;padding:9px 10px;font-family:'Open Sans',sans-serif;outline:none;background:#fff}
+.members-list{display:flex;flex-direction:column;gap:8px}
+.member-card{background:#fff;border:1px solid #e3eaf8;border-radius:12px;padding:12px 14px;display:flex;align-items:center;gap:11px;box-shadow:var(--sombra2);transition:box-shadow .2s}
+.member-card:hover{box-shadow:0 4px 16px rgba(26,35,126,.12)}
+.member-card.aniv{border-left:3px solid #29b6f6}
+.member-card.pend{border-left:3px solid #f9a825;background:#fffde7}
+.avatar{width:40px;height:40px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;flex-shrink:0;font-family:'Montserrat',sans-serif}
+.member-info{flex:1;min-width:0}
+.member-name{font-size:14px;font-weight:600;color:var(--azul-esc);font-family:'Montserrat',sans-serif;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.member-meta{font-size:12px;color:#5c6bc0;margin-top:2px;display:flex;flex-wrap:wrap;gap:5px;align-items:center}
+.badge{font-size:10px;padding:2px 7px;border-radius:20px;font-weight:700}
+.b-ativo{background:#e8f5e9;color:#2e7d32}.b-inativo{background:#fce4e4;color:#c62828}
+.b-visit{background:#fff3e0;color:#e65100}.b-aniv{background:#e1f5fe;color:#0277bd}
+.b-novo{background:#ede7f6;color:#4527a0}
+.actions{display:flex;gap:5px;flex-shrink:0}
+.btn-ed{background:#e8f0fe;color:#1565c0;border:1px solid #c5cae9;border-radius:7px;padding:4px 9px;font-size:11px;font-weight:600;cursor:pointer}
+.btn-del{background:#fce4e4;color:#c62828;border:1px solid #ffcdd2;border-radius:7px;padding:4px 9px;font-size:11px;font-weight:600;cursor:pointer}
+.btn-ap{background:#e8f5e9;color:#2e7d32;border:1px solid #c8e6c9;border-radius:7px;padding:4px 9px;font-size:11px;font-weight:600;cursor:pointer}
+.empty{text-align:center;padding:2.5rem;color:#9fa8da;font-size:13px;font-style:italic}
+.overlay{display:none;position:fixed;inset:0;background:rgba(26,35,126,.4);z-index:200;align-items:center;justify-content:center;padding:1rem}
+.overlay.open{display:flex}
+.modal{background:#fff;border-radius:16px;padding:1.5rem;width:100%;max-width:460px;max-height:90vh;overflow-y:auto;box-shadow:0 8px 40px rgba(26,35,126,.2)}
+.modal h3{font-family:'Montserrat',sans-serif;font-size:15px;font-weight:700;color:var(--azul-esc);margin-bottom:1rem}
+.modal-footer{display:flex;justify-content:flex-end;gap:8px;margin-top:1.1rem}
+.btn-cancel{background:#fff;color:#5c6bc0;border:1.5px solid #c5cae9;border-radius:8px;padding:8px 14px;font-size:13px;font-family:'Open Sans',sans-serif;cursor:pointer}
+.btn-salvar{background:var(--grad);color:#fff;border:none;border-radius:8px;padding:8px 18px;font-size:13px;font-family:'Montserrat',sans-serif;font-weight:700;cursor:pointer;box-shadow:0 2px 8px rgba(21,101,192,.3)}
+.lock-wrap{max-width:300px;margin:2rem auto;text-align:center}
+.lock-icon{width:56px;height:56px;border-radius:50%;background:var(--grad);display:flex;align-items:center;justify-content:center;margin:0 auto 1rem;box-shadow:var(--sombra)}
+.lock-wrap h3{font-family:'Montserrat',sans-serif;font-size:16px;font-weight:700;color:var(--azul-esc);margin-bottom:.4rem}
+.lock-wrap p{font-size:13px;color:#5c6bc0;margin-bottom:1.2rem}
+.lock-wrap input{width:100%;font-size:16px;border:1.5px solid #c5cae9;border-radius:9px;padding:10px;text-align:center;letter-spacing:4px;font-family:'Montserrat',sans-serif;outline:none;margin-bottom:.6rem;transition:border .2s}
+.lock-wrap input:focus{border-color:var(--azul-med)}
+.btn-entrar{width:100%;background:var(--grad);color:#fff;border:none;border-radius:9px;padding:11px;font-size:14px;font-family:'Montserrat',sans-serif;font-weight:700;cursor:pointer;box-shadow:0 3px 12px rgba(21,101,192,.3)}
+/* CONFIG FIREBASE */
+.cfg-box{background:#fffde7;border:1.5px solid #ffe082;border-radius:12px;padding:1.2rem;margin-bottom:1rem;font-size:13px;color:#5d4037;line-height:1.7}
+.cfg-box strong{color:#e65100;font-size:14px}
+.cfg-box code{background:#fff3e0;border-radius:4px;padding:1px 5px;font-family:monospace;font-size:12px}
+.cfg-status{display:flex;align-items:center;gap:6px;font-size:12px;font-weight:600;margin-top:.5rem}
+.dot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
+.dot.ok{background:#43a047}.dot.err{background:#e53935}.dot.wait{background:#fb8c00}
+@media(max-width:400px){.form-row{grid-template-columns:1fr}.stats-grid{grid-template-columns:repeat(2,1fr)}.header h2{font-size:18px}}
+</style>
+</head>
+<body>
+<div class="page">
+
+  <!-- FORMULÁRIO PÚBLICO -->
+  <div id="public-section">
+    <div class="header">
+      <img class="header-logo" src="logo.png" alt="Logo Igreja Novo e Vivo Caminho" onerror="this.style.display='none';document.getElementById('logo-fallback').style.display='flex'">
+      <div class="header-logo-fallback" id="logo-fallback" style="display:none">NC</div>
+      <h1>Igreja</h1>
+      <h2>Novo e Vivo Caminho<span>Cadastro de Membros</span></h2>
+      <p>Preencha seus dados abaixo para fazer parte da nossa família. Suas informações são tratadas com sigilo e cuidado.</p>
+    </div>
+
+    <div class="card" id="form-area">
+      <div class="card-title">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#1565c0" stroke-width="2.5"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+        Dados pessoais
+      </div>
+      <div class="form-row full"><div class="form-group"><label>Nome completo *</label><input id="pf-nome" type="text" placeholder="Seu nome completo"/></div></div>
+      <div class="form-row">
+        <div class="form-group"><label>Data de nascimento</label><input id="pf-nasc" type="date"/></div>
+        <div class="form-group"><label>Sexo</label><select id="pf-sexo"><option value="">—</option><option value="F">Feminino</option><option value="M">Masculino</option></select></div>
+      </div>
+      <div class="form-row">
+        <div class="form-group"><label>Telefone / WhatsApp</label><input id="pf-tel" type="tel" placeholder="(85) 9xxxx-xxxx"/></div>
+        <div class="form-group"><label>E-mail</label><input id="pf-email" type="email" placeholder="email@exemplo.com"/></div>
+      </div>
+      <div class="form-row full"><div class="form-group"><label>Endereço</label><input id="pf-end" type="text" placeholder="Rua, número, bairro"/></div></div>
+      <div class="card-title" style="margin-top:1.2rem">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#1565c0" stroke-width="2.5"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+        Dados ministeriais
+      </div>
+      <div class="form-row">
+        <div class="form-group"><label>Data de conversão</label><input id="pf-conv" type="date"/></div>
+        <div class="form-group"><label>Data de batismo</label><input id="pf-bat" type="date"/></div>
+      </div>
+      <div class="form-row">
+        <div class="form-group"><label>Ministério / Célula</label><input id="pf-min" type="text" placeholder="Ex: Louvor, Infantil..."/></div>
+        <div class="form-group"><label>Como você se descreve?</label>
+          <select id="pf-status">
+            <option value="visitante">Visitante</option>
+            <option value="ativo">Membro ativo</option>
+            <option value="inativo">Membro inativo</option>
+          </select>
+        </div>
+      </div>
+      <div class="form-row full"><div class="form-group"><label>Observações</label><input id="pf-obs" type="text" placeholder="Informações adicionais..."/></div></div>
+      <button class="btn-enviar" id="btn-enviar" onclick="submitPublic()">Enviar meu cadastro</button>
+    </div>
+
+    <div class="card success" id="success-area">
+      <div class="success-icon">✓</div>
+      <h3>Cadastro enviado!</h3>
+      <p id="success-msg">Obrigado! Seu cadastro foi recebido.</p>
+      <button class="btn-outro" onclick="novoCadastro()">Cadastrar outra pessoa</button>
+    </div>
+
+    <div class="admin-link"><a href="#" onclick="showAdminLogin();return false">Área administrativa</a></div>
+  </div>
+
+  <!-- LOGIN ADMIN -->
+  <div id="lock-section" style="display:none">
+    <div class="header" style="margin-bottom:1.5rem">
+      <img class="header-logo" src="logo.png" alt="Logo" onerror="this.style.display='none'">
+      <h1>Igreja</h1>
+      <h2>Novo e Vivo Caminho<span>Painel Administrativo</span></h2>
+    </div>
+    <div class="card">
+      <div class="lock-wrap">
+        <div class="lock-icon">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+        </div>
+        <h3>Área restrita</h3>
+        <p>Digite a senha de administrador</p>
+        <input type="password" id="pass-input" placeholder="••••" onkeydown="if(event.key==='Enter')checkPass()"/>
+        <div id="pass-err" style="font-size:12px;color:#c62828;margin-bottom:.6rem;display:none">Senha incorreta. Tente novamente.</div>
+        <button class="btn-entrar" onclick="checkPass()">Entrar no painel</button>
+        <div style="margin-top:1rem"><a href="#" onclick="showPublic();return false" style="font-size:12px;color:#9fa8da;text-decoration:none;font-weight:600">← Voltar ao cadastro</a></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- PAINEL ADMIN -->
+  <div id="admin-section" style="display:none" class="admin-panel">
+    <div class="admin-header">
+      <div>
+        <h2>Painel de Membros</h2>
+        <p id="admin-subtitle">Carregando...</p>
+      </div>
+      <div style="display:flex;gap:8px;align-items:center">
+        <button class="btn-sair" style="background:rgba(255,255,255,.1);font-size:11px" onclick="showConfig()">⚙ Firebase</button>
+        <button class="btn-sair" onclick="exportarJSON()">Exportar</button>
+        <button class="btn-sair" onclick="sairAdmin()">Sair</button>
+      </div>
+    </div>
+
+    <!-- STATUS CONEXÃO -->
+    <div id="db-status" style="display:none;margin-bottom:.8rem"></div>
+
+    <div class="stats-grid" id="stats-grid"></div>
+    <div class="tabs" id="tabs">
+      <div class="tab active" onclick="setTab('todos',this)">Todos</div>
+      <div class="tab" onclick="setTab('aniversarios',this)">Aniversários</div>
+      <div class="tab" onclick="setTab('novos',this)">Novos</div>
+      <div class="tab" id="tab-pend" onclick="setTab('pendentes',this)">Aprovações</div>
+    </div>
+    <div class="search-bar" id="search-bar">
+      <input type="text" id="search" placeholder="Buscar nome, telefone, e-mail..." oninput="renderList()"/>
+      <select id="filter-status" onchange="renderList()">
+        <option value="">Todos</option><option value="ativo">Ativo</option>
+        <option value="inativo">Inativo</option><option value="visitante">Visitante</option>
+      </select>
+    </div>
+    <div style="display:flex;justify-content:flex-end;margin-bottom:.8rem" id="btn-add-wrap">
+      <button class="btn-salvar" onclick="openModal()">+ Novo membro</button>
+    </div>
+    <div class="members-list" id="list"></div>
+  </div>
+
+  <!-- CONFIG FIREBASE -->
+  <div id="config-section" style="display:none">
+    <div class="header" style="margin-bottom:1.5rem">
+      <h1>Igreja</h1>
+      <h2>Novo e Vivo Caminho<span>Configuração Firebase</span></h2>
+    </div>
+    <div class="card">
+      <div class="cfg-box">
+        <strong>⚙ Como configurar o banco de dados em nuvem</strong><br><br>
+        <b>1.</b> Acesse <a href="https://console.firebase.google.com" target="_blank" style="color:#1565c0">console.firebase.google.com</a> com sua conta Google<br>
+        <b>2.</b> Clique em <b>Criar projeto</b> → dê um nome (ex: <code>igreja-nvc</code>)<br>
+        <b>3.</b> No menu lateral, clique em <b>Firestore Database</b> → <b>Criar banco de dados</b> → modo <b>Produção</b><br>
+        <b>4.</b> Vá em <b>Configurações do projeto</b> (ícone de engrenagem) → <b>Seus apps</b> → clique em <b>&lt;/&gt;</b> (Web)<br>
+        <b>5.</b> Copie os dados do <code>firebaseConfig</code> e cole nos campos abaixo<br>
+        <b>6.</b> Em <b>Regras do Firestore</b>, cole as seguintes regras:<br>
+        <code style="display:block;margin-top:.5rem;white-space:pre;font-size:11px;background:#f5f5f5;padding:.5rem;border-radius:6px">rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    match /membros/{id} {
+      allow read, write: if true;
+    }
+    match /pendentes/{id} {
+      allow read, write: if true;
+    }
+  }
+}</code>
+      </div>
+
+      <div class="form-group" style="margin-bottom:10px"><label>API Key</label><input id="cfg-apiKey" type="text" placeholder="AIzaSy..."/></div>
+      <div class="form-group" style="margin-bottom:10px"><label>Auth Domain</label><input id="cfg-authDomain" type="text" placeholder="seu-projeto.firebaseapp.com"/></div>
+      <div class="form-group" style="margin-bottom:10px"><label>Project ID</label><input id="cfg-projectId" type="text" placeholder="seu-projeto"/></div>
+      <div class="form-group" style="margin-bottom:10px"><label>Storage Bucket</label><input id="cfg-storageBucket" type="text" placeholder="seu-projeto.appspot.com"/></div>
+      <div class="form-group" style="margin-bottom:10px"><label>Messaging Sender ID</label><input id="cfg-messagingSenderId" type="text" placeholder="123456789"/></div>
+      <div class="form-group" style="margin-bottom:1.2rem"><label>App ID</label><input id="cfg-appId" type="text" placeholder="1:123:web:abc..."/></div>
+
+      <div id="cfg-feedback" style="font-size:13px;color:#2e7d32;margin-bottom:.8rem;display:none"></div>
+
+      <button class="btn-salvar" style="width:100%" onclick="salvarConfig()">Salvar e conectar</button>
+      <div style="margin-top:.8rem;text-align:center">
+        <a href="#" onclick="showAdmin();return false" style="font-size:12px;color:#9fa8da;text-decoration:none;font-weight:600">← Voltar ao painel</a>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<!-- MODAL -->
+<div class="overlay" id="modal-wrap">
+  <div class="modal">
+    <h3 id="modal-title">Novo membro</h3>
+    <div class="form-row full"><div class="form-group"><label>Nome completo *</label><input id="f-nome" type="text"/></div></div>
+    <div class="form-row">
+      <div class="form-group"><label>Data de nascimento</label><input id="f-nasc" type="date"/></div>
+      <div class="form-group"><label>Sexo</label><select id="f-sexo"><option value="">—</option><option value="F">Feminino</option><option value="M">Masculino</option></select></div>
+    </div>
+    <div class="form-row">
+      <div class="form-group"><label>Telefone</label><input id="f-tel" type="tel"/></div>
+      <div class="form-group"><label>E-mail</label><input id="f-email" type="email"/></div>
+    </div>
+    <div class="form-row full"><div class="form-group"><label>Endereço</label><input id="f-end" type="text"/></div></div>
+    <div class="form-row">
+      <div class="form-group"><label>Data de conversão</label><input id="f-conv" type="date"/></div>
+      <div class="form-group"><label>Data de batismo</label><input id="f-bat" type="date"/></div>
+    </div>
+    <div class="form-row">
+      <div class="form-group"><label>Ministério / Célula</label><input id="f-min" type="text"/></div>
+      <div class="form-group"><label>Status</label>
+        <select id="f-status"><option value="ativo">Ativo</option><option value="inativo">Inativo</option><option value="visitante">Visitante</option></select>
+      </div>
+    </div>
+    <div class="form-row full"><div class="form-group"><label>Observações</label><input id="f-obs" type="text"/></div></div>
+    <div class="modal-footer">
+      <button class="btn-cancel" onclick="closeModal()">Cancelar</button>
+      <button class="btn-salvar" onclick="saveMember()">Salvar membro</button>
+    </div>
+  </div>
+</div>
+
+<!-- Firebase SDK -->
+<script type="module">
+import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js';
+import {
+  getFirestore, collection, getDocs, addDoc, setDoc, deleteDoc, doc, onSnapshot
+} from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js';
+
+// ─── CONFIG ────────────────────────────────────────────────────────────────
+const CFG_KEY = 'nvc_firebase_cfg';
+const ADMIN_PASS = '1234'; // ← TROQUE A SENHA AQUI
+
+const COLORS=[
+  {bg:'#bbdefb',tx:'#0d47a1'},{bg:'#b3e5fc',tx:'#01579b'},{bg:'#c8e6c9',tx:'#1b5e20'},
+  {bg:'#ffe0b2',tx:'#e65100'},{bg:'#e1bee7',tx:'#4a148c'},{bg:'#fce4ec',tx:'#880e4f'},
+  {bg:'#dcedc8',tx:'#33691e'}
+];
+
+let db = null, members = [], pending = [], editId = null, currentTab = 'todos';
+let unsubMembers = null, unsubPending = null;
+
+// ─── FIREBASE ──────────────────────────────────────────────────────────────
+function loadConfig(){
+  try{ return JSON.parse(localStorage.getItem(CFG_KEY)); }catch(e){ return null; }
+}
+function saveConfig(cfg){
+  localStorage.setItem(CFG_KEY, JSON.stringify(cfg));
+}
+
+async function connectFirebase(cfg){
+  try {
+    const app = initializeApp(cfg, cfg.projectId);
+    db = getFirestore(app);
+    // Teste de conexão
+    await getDocs(collection(db,'membros'));
+    setDbStatus(true);
+    startListeners();
+    return true;
+  } catch(e) {
+    db = null;
+    setDbStatus(false, e.message);
+    return false;
+  }
+}
+
+function startListeners(){
+  if(unsubMembers) unsubMembers();
+  if(unsubPending) unsubPending();
+  unsubMembers = onSnapshot(collection(db,'membros'), snap => {
+    members = snap.docs.map(d=>{const data=d.data();delete data.id;return{id:d.id,...data};});
+    if(document.getElementById('admin-section').style.display!=='none') renderAdmin();
+  });
+  unsubPending = onSnapshot(collection(db,'pendentes'), snap => {
+    pending = snap.docs.map(d=>{const data=d.data();delete data.id;return{id:d.id,...data};});
+    if(document.getElementById('admin-section').style.display!=='none') renderAdmin();
+  });
+}
+
+function setDbStatus(ok, msg=''){
+  const el = document.getElementById('db-status');
+  if(!el) return;
+  el.style.display = 'block';
+  el.innerHTML = `<div class="cfg-status"><div class="dot ${ok?'ok':'err'}"></div><span style="color:${ok?'#2e7d32':'#c62828'}">${ok?'Firebase conectado — dados em tempo real':'Erro na conexão: '+msg}</span></div>`;
+}
+
+// ─── CRUD ──────────────────────────────────────────────────────────────────
+async function addMember(data){
+  if(!db) return fallbackAdd('membros', data);
+  const clean={...data};delete clean.id;
+  await addDoc(collection(db,'membros'), clean);
+}
+async function updateMember(id, data){
+  if(!db) return fallbackUpdate('membros', id, data);
+  await setDoc(doc(db,'membros',id), data, {merge:true});
+}
+async function removeMember(id){
+  if(!db) return fallbackRemove('membros', id);
+  await deleteDoc(doc(db,'membros',id));
+}
+async function addPending(data){
+  if(!db) return fallbackAdd('pendentes', data);
+  const clean={...data};delete clean.id;
+  await addDoc(collection(db,'pendentes'), clean);
+}
+async function removePending(id){
+  if(!db) return fallbackRemove('pendentes', id);
+  await deleteDoc(doc(db,'pendentes',id));
+}
+async function approvePending(id){
+  const m = pending.find(x=>x.id===id); if(!m) return;
+  const {_pendente,_enviadoEm,...clean} = m;
+  await addMember(clean);
+  await removePending(id);
+}
+
+// fallback localStorage se sem firebase
+const LS_M='nvc_membros', LS_P='nvc_pend';
+function fallbackLoad(){
+  try{members=JSON.parse(localStorage.getItem(LS_M)||'[]');}catch(e){members=[];}
+  try{pending=JSON.parse(localStorage.getItem(LS_P)||'[]');}catch(e){pending=[];}
+}
+function fallbackSave(){
+  localStorage.setItem(LS_M,JSON.stringify(members));
+  localStorage.setItem(LS_P,JSON.stringify(pending));
+}
+function fallbackAdd(col,data){ const id=String(Date.now()); if(col==='membros'){members.push({id,...data});}else{pending.push({id,...data});} fallbackSave(); renderAdmin(); }
+function fallbackUpdate(col,id,data){ if(col==='membros'){const i=members.findIndex(m=>m.id===id);if(i>-1)members[i]={...members[i],...data};} fallbackSave(); renderAdmin(); }
+function fallbackRemove(col,id){ if(col==='membros'){members=members.filter(m=>m.id!==id);}else{pending=pending.filter(m=>m.id!==id);} fallbackSave(); renderAdmin(); }
+
+// ─── UTILITÁRIOS ──────────────────────────────────────────────────────────
+function fmt(d){if(!d)return'—';const[y,m,dia]=d.split('-');return`${dia}/${m}/${y}`;}
+function age(d){if(!d)return'';const b=new Date(d),n=new Date(),a=n.getFullYear()-b.getFullYear();const mo=n.getMonth()-b.getMonth();return(mo<0||(mo===0&&n.getDate()<b.getDate()))?a-1:a;}
+function initials(n){return n.trim().split(' ').slice(0,2).map(w=>w[0]||'').join('').toUpperCase();}
+function colorFor(id){const h=String(id).split('').reduce((a,c)=>a+c.charCodeAt(0),0);return COLORS[h%COLORS.length];}
+function isAnivMes(d){if(!d)return false;return parseInt(d.split('-')[1])===new Date().getMonth()+1;}
+function isAnivHoje(d){if(!d)return false;const n=new Date();return parseInt(d.split('-')[1])===n.getMonth()+1&&parseInt(d.split('-')[2])===n.getDate();}
+function isNovo(d){if(!d)return false;return(new Date()-new Date(d))<365*24*3600*1000;}
+function daysToAniv(d){if(!d)return 9999;const n=new Date(),b=new Date(d),t=new Date(n.getFullYear(),b.getMonth(),b.getDate());if(t<n)t.setFullYear(n.getFullYear()+1);return Math.round((t-n)/86400000);}
+
+// ─── NAVEGAÇÃO ────────────────────────────────────────────────────────────
+window.showPublic=()=>{
+  ['public-section'].forEach(id=>document.getElementById(id).style.display='block');
+  ['lock-section','admin-section','config-section'].forEach(id=>document.getElementById(id).style.display='none');
+};
+window.showAdminLogin=()=>{
+  document.getElementById('public-section').style.display='none';
+  document.getElementById('lock-section').style.display='block';
+  document.getElementById('admin-section').style.display='none';
+  document.getElementById('config-section').style.display='none';
+  setTimeout(()=>{const el=document.getElementById('pass-input');if(el)el.focus();},100);
+};
+window.showAdmin=()=>{
+  document.getElementById('public-section').style.display='none';
+  document.getElementById('lock-section').style.display='none';
+  document.getElementById('admin-section').style.display='block';
+  document.getElementById('config-section').style.display='none';
+  if(!db){ fallbackLoad(); setDbStatus(false,'Firebase não configurado. Usando armazenamento local.'); }
+  renderAdmin();
+};
+window.showConfig=()=>{
+  document.getElementById('admin-section').style.display='none';
+  document.getElementById('config-section').style.display='block';
+  const cfg=loadConfig();
+  if(cfg){
+    document.getElementById('cfg-apiKey').value=cfg.apiKey||'';
+    document.getElementById('cfg-authDomain').value=cfg.authDomain||'';
+    document.getElementById('cfg-projectId').value=cfg.projectId||'';
+    document.getElementById('cfg-storageBucket').value=cfg.storageBucket||'';
+    document.getElementById('cfg-messagingSenderId').value=cfg.messagingSenderId||'';
+    document.getElementById('cfg-appId').value=cfg.appId||'';
+  }
+};
+window.sairAdmin=showPublic;
+
+window.checkPass=()=>{
+  const v=document.getElementById('pass-input').value;
+  if(v===ADMIN_PASS){document.getElementById('pass-input').value='';showAdmin();}
+  else{document.getElementById('pass-err').style.display='block';}
+};
+
+window.salvarConfig=async()=>{
+  const cfg={
+    apiKey:document.getElementById('cfg-apiKey').value.trim(),
+    authDomain:document.getElementById('cfg-authDomain').value.trim(),
+    projectId:document.getElementById('cfg-projectId').value.trim(),
+    storageBucket:document.getElementById('cfg-storageBucket').value.trim(),
+    messagingSenderId:document.getElementById('cfg-messagingSenderId').value.trim(),
+    appId:document.getElementById('cfg-appId').value.trim()
+  };
+  if(!cfg.apiKey||!cfg.projectId){alert('Preencha pelo menos a API Key e o Project ID.');return;}
+  const fb=document.getElementById('cfg-feedback');
+  fb.style.display='block';fb.textContent='Conectando...';fb.style.color='#1565c0';
+  saveConfig(cfg);
+  const ok=await connectFirebase(cfg);
+  if(ok){fb.textContent='✓ Conectado com sucesso!';fb.style.color='#2e7d32';setTimeout(()=>showAdmin(),1500);}
+  else{fb.textContent='✗ Erro ao conectar. Verifique os dados e as regras do Firestore.';fb.style.color='#c62828';}
+};
+
+// ─── FORMULÁRIO PÚBLICO ───────────────────────────────────────────────────
+window.submitPublic=async()=>{
+  const nome=document.getElementById('pf-nome').value.trim();
+  if(!nome){alert('Por favor, informe seu nome completo.');return;}
+  const btn=document.getElementById('btn-enviar');
+  btn.disabled=true;btn.textContent='Enviando...';
+  const data={
+    nome,nasc:document.getElementById('pf-nasc').value,
+    sexo:document.getElementById('pf-sexo').value,
+    tel:document.getElementById('pf-tel').value,
+    email:document.getElementById('pf-email').value,
+    end:document.getElementById('pf-end').value,
+    conv:document.getElementById('pf-conv').value,
+    bat:document.getElementById('pf-bat').value,
+    min:document.getElementById('pf-min').value,
+    status:document.getElementById('pf-status').value,
+    obs:document.getElementById('pf-obs').value,
+    _pendente:true,_enviadoEm:new Date().toISOString()
+  };
+  await addPending(data);
+  btn.disabled=false;btn.textContent='Enviar meu cadastro';
+  document.getElementById('form-area').style.display='none';
+  document.getElementById('success-msg').textContent=`Obrigado, ${nome}! Seu cadastro foi recebido e será revisado em breve pela liderança.`;
+  document.getElementById('success-area').style.display='block';
+};
+
+window.novoCadastro=()=>{
+  ['pf-nome','pf-nasc','pf-tel','pf-email','pf-end','pf-conv','pf-bat','pf-min','pf-obs'].forEach(id=>{const e=document.getElementById(id);if(e)e.value='';});
+  document.getElementById('pf-sexo').value='';document.getElementById('pf-status').value='visitante';
+  document.getElementById('form-area').style.display='block';
+  document.getElementById('success-area').style.display='none';
+};
+
+// ─── ADMIN RENDER ─────────────────────────────────────────────────────────
+function renderAdmin(){
+  const ativos=members.filter(m=>m.status==='ativo').length;
+  const anivMes=members.filter(m=>isAnivMes(m.nasc)).length;
+  const novos=members.filter(m=>isNovo(m.conv)).length;
+  const batizados=members.filter(m=>m.bat).length;
+  const pc=pending.length;
+  document.getElementById('admin-subtitle').textContent=`${members.length} membro${members.length!==1?'s':''} cadastrado${members.length!==1?'s':''}`;
+  document.getElementById('stats-grid').innerHTML=`
+    <div class="stat"><div class="stat-val">${members.length}</div><div class="stat-lbl">Total</div></div>
+    <div class="stat"><div class="stat-val">${ativos}</div><div class="stat-lbl">Ativos</div></div>
+    <div class="stat"><div class="stat-val">${anivMes}</div><div class="stat-lbl">Aniversários</div></div>
+    <div class="stat"><div class="stat-val">${novos}</div><div class="stat-lbl">Novos</div></div>
+    <div class="stat"><div class="stat-val">${batizados}</div><div class="stat-lbl">Batizados</div></div>
+    <div class="stat" style="${pc>0?'border-left:3px solid #f9a825':''}"><div class="stat-val" style="${pc>0?'color:#f57f17':''}">${pc}</div><div class="stat-lbl">Aguardando</div></div>`;
+  const tabPend=document.getElementById('tab-pend');
+  tabPend.innerHTML=`Aprovações${pc>0?`<span class='pending-badge'>${pc}</span>`:''}`;
+  renderAdminContent();
+}
+
+function renderAdminContent(){
+  const search=document.getElementById('search-bar'),addBtn=document.getElementById('btn-add-wrap');
+  if(currentTab==='pendentes'){
+    if(search)search.style.display='none';if(addBtn)addBtn.style.display='none';
+    renderPendentes();
+  } else {
+    if(search)search.style.display='flex';if(addBtn)addBtn.style.display='flex';
+    renderList();
+  }
+}
+
+function renderPendentes(){
+  const el=document.getElementById('list');
+  if(!pending.length){el.innerHTML='<div class="empty">Nenhum cadastro aguardando aprovação.</div>';return;}
+  el.innerHTML=`<div style="font-size:13px;color:#5c6bc0;font-weight:600;margin-bottom:.8rem">${pending.length} cadastro${pending.length!==1?'s':''} aguardando aprovação</div>`+
+  pending.map(m=>{
+    const c=colorFor(m.id);
+    return`<div class="member-card pend">
+      <div class="avatar" style="background:${c.bg};color:${c.tx}">${initials(m.nome)}</div>
+      <div class="member-info">
+        <div class="member-name">${m.nome}</div>
+        <div class="member-meta">
+          ${m.nasc?`<span>Nasc. ${fmt(m.nasc)} (${age(m.nasc)}a)</span>`:''}
+          ${m.tel?`<span>${m.tel}</span>`:''}${m.min?`<span>${m.min}</span>`:''}
+          <span class="badge b-visit">${m.status}</span>
+        </div>
+        <div style="font-size:11px;color:#b0bec5;margin-top:2px">Enviado em ${new Date(m._enviadoEm).toLocaleString('pt-BR')}</div>
+      </div>
+      <div class="actions">
+        <button class="btn-ap" data-id="${m.id}" onclick="aprovar(this.dataset.id)">Aprovar</button>
+        <button class="btn-del" data-id="${m.id}" onclick="rejeitar(this.dataset.id)">Rejeitar</button>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+window.aprovar=async(id)=>{ await approvePending(id); };
+window.rejeitar=async(id)=>{
+  if(!confirm('Rejeitar e excluir este cadastro?'))return;
+  await removePending(id);
+};
+
+function getFiltered(){
+  const q=(document.getElementById('search')||{}).value?.toLowerCase()||'';
+  const st=(document.getElementById('filter-status')||{}).value||'';
+  let list=[...members];
+  if(currentTab==='aniversarios')list=list.filter(m=>isAnivMes(m.nasc));
+  if(currentTab==='novos')list=list.filter(m=>isNovo(m.conv));
+  if(q)list=list.filter(m=>(m.nome||'').toLowerCase().includes(q)||(m.tel||'').includes(q)||(m.email||'').toLowerCase().includes(q));
+  if(st)list=list.filter(m=>m.status===st);
+  if(currentTab==='aniversarios')list.sort((a,b)=>daysToAniv(a.nasc)-daysToAniv(b.nasc));
+  return list;
+}
+
+window.renderList=()=>{
+  const list=getFiltered(),el=document.getElementById('list');if(!el)return;
+  if(!list.length){el.innerHTML='<div class="empty">Nenhum membro encontrado.</div>';return;}
+  el.innerHTML=list.map(m=>{
+    const c=colorFor(m.id),hoje=isAnivHoje(m.nasc);
+    const ab=hoje?'<span class="badge b-aniv">🎂 Aniversário hoje</span>':(isAnivMes(m.nasc)?`<span class="badge b-aniv">Aniv. em ${daysToAniv(m.nasc)}d</span>`:'');
+    const nb=isNovo(m.conv)?'<span class="badge b-novo">Novo</span>':'';
+    const sb=m.status==='ativo'?'b-ativo':m.status==='inativo'?'b-inativo':'b-visit';
+    const sl=m.status==='ativo'?'Ativo':m.status==='inativo'?'Inativo':'Visitante';
+    return`<div class="member-card${hoje?' aniv':''}">
+      <div class="avatar" style="background:${c.bg};color:${c.tx}">${initials(m.nome)}</div>
+      <div class="member-info">
+        <div class="member-name">${m.nome}</div>
+        <div class="member-meta">
+          ${m.nasc?`<span>Nasc. ${fmt(m.nasc)} (${age(m.nasc)}a)</span>`:''}
+          ${m.min?`<span>${m.min}</span>`:''}
+          <span class="badge ${sb}">${sl}</span>${ab}${nb}
+        </div>
+        ${m.tel||m.email?`<div style="font-size:11px;color:#b0bec5;margin-top:2px">${[m.tel,m.email].filter(Boolean).join(' · ')}</div>`:''}
+      </div>
+      <div class="actions">
+        <button class="btn-ed" data-id="${m.id}" onclick="editMember(this.dataset.id)">Editar</button>
+        <button class="btn-del" data-id="${m.id}" onclick="deleteMember(this.dataset.id)">Excluir</button>
+      </div>
+    </div>`;
+  }).join('');
+};
+
+window.setTab=(tab,el)=>{
+  currentTab=tab;
+  document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
+  if(el)el.classList.add('active');
+  renderAdminContent();
+};
+
+window.openModal=()=>{editId=null;document.getElementById('modal-title').textContent='Novo membro';clearForm();document.getElementById('modal-wrap').classList.add('open');};
+window.closeModal=()=>{document.getElementById('modal-wrap').classList.remove('open');};
+function clearForm(){['nome','nasc','tel','email','end','conv','bat','min','obs'].forEach(f=>{const e=document.getElementById('f-'+f);if(e)e.value='';});document.getElementById('f-sexo').value='';document.getElementById('f-status').value='ativo';}
+
+window.editMember=(id)=>{
+  const m=members.find(x=>String(x.id)===String(id));if(!m)return;
+  editId=m.id;
+  document.getElementById('modal-title').textContent='Editar membro';
+  ['nome','nasc','tel','email','end','conv','bat','min','obs'].forEach(f=>{const e=document.getElementById('f-'+f);if(e)e.value=m[f]||'';});
+  document.getElementById('f-sexo').value=m.sexo||'';
+  document.getElementById('f-status').value=m.status||'ativo';
+  document.getElementById('modal-wrap').classList.add('open');
+};
+
+window.saveMember=async()=>{
+  const nome=document.getElementById('f-nome').value.trim();
+  if(!nome){alert('Informe o nome do membro.');return;}
+  const data={nome,nasc:document.getElementById('f-nasc').value,sexo:document.getElementById('f-sexo').value,tel:document.getElementById('f-tel').value,email:document.getElementById('f-email').value,end:document.getElementById('f-end').value,conv:document.getElementById('f-conv').value,bat:document.getElementById('f-bat').value,min:document.getElementById('f-min').value,status:document.getElementById('f-status').value,obs:document.getElementById('f-obs').value};
+  try{
+    if(editId){await updateMember(String(editId),data);}
+    else{await addMember(data);}
+    closeModal();
+    if(!db)renderAdmin();
+  }catch(e){alert('Erro ao salvar: '+e.message);}
+};
+
+window.deleteMember=async(id)=>{
+  if(!confirm('Excluir este membro?'))return;
+  try{
+    await removeMember(String(id));
+    if(!db)renderAdmin();
+  }catch(e){alert('Erro ao excluir: '+e.message);}
+};
+
+window.exportarJSON=()=>{
+  try{
+    const cols=['nome','nasc','sexo','tel','email','end','conv','bat','min','status','obs'];
+    const header=['Nome','Nascimento','Sexo','Telefone','Email','Endereco','Conversao','Batismo','Ministerio','Status','Observacoes'];
+    const rows=members.map(m=>cols.map(c=>{const v=(m[c]||'').toString().replace(/"/g,'""');return '"'+v+'"';}).join(';'));
+    const csv='\uFEFF'+header.join(';')+'\n'+rows.join('\n');
+    const b=new Blob([csv],{type:'text/csv;charset=utf-8'});
+    const a=document.createElement('a');a.href=URL.createObjectURL(b);a.download='membros_nvc.csv';a.click();
+  }catch(e){alert('Erro ao exportar: '+e.message);}
+};
+
+// ─── INIT ─────────────────────────────────────────────────────────────────
+const FIREBASE_DEFAULT = {
+  apiKey: "AIzaSyArcBJ6GrE9DYwbQEcwteA-KwoGLP0OZSY",
+  authDomain: "igreja-nvc-45b4f.firebaseapp.com",
+  projectId: "igreja-nvc-45b4f",
+  storageBucket: "igreja-nvc-45b4f.firebasestorage.app",
+  messagingSenderId: "919626696984",
+  appId: "1:919626696984:web:f125f478eba465330e366d"
+};
+
+(async()=>{
+  const cfg = loadConfig() || FIREBASE_DEFAULT;
+  if(cfg && cfg.apiKey){ await connectFirebase(cfg); }
+})();
+</script>
+</body>
+</html>
