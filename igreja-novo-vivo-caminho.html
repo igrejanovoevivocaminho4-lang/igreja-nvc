@@ -350,69 +350,115 @@ async function connectFirebase(cfg){
   }
 }
 
+// ─── CACHE LOCAL (offline-first) ──────────────────────────────────────────
+const LS_CACHE_M = 'nvc_cache_membros';
+const LS_CACHE_P = 'nvc_cache_pend';
+const LS_QUEUE   = 'nvc_queue'; // operações pendentes offline
+
+function saveLocalCache(){
+  localStorage.setItem(LS_CACHE_M, JSON.stringify(members));
+  localStorage.setItem(LS_CACHE_P, JSON.stringify(pending));
+}
+function loadLocalCache(){
+  try{members=JSON.parse(localStorage.getItem(LS_CACHE_M)||localStorage.getItem('nvc_membros')||'[]');}catch(e){members=[];}
+  try{pending=JSON.parse(localStorage.getItem(LS_CACHE_P)||localStorage.getItem('nvc_pend')||'[]');}catch(e){pending=[];}
+}
+function getQueue(){ try{return JSON.parse(localStorage.getItem(LS_QUEUE)||'[]');}catch(e){return[];} }
+function saveQueue(q){ localStorage.setItem(LS_QUEUE, JSON.stringify(q)); }
+function addToQueue(op){ const q=getQueue(); q.push(op); saveQueue(q); }
+
+async function syncQueue(){
+  if(!db) return;
+  const q=getQueue(); if(!q.length) return;
+  const failed=[];
+  for(const op of q){
+    try{
+      if(op.type==='add'){const c={...op.data};delete c.id;await addDoc(collection(db,op.col),c);}
+      else if(op.type==='update'){await setDoc(doc(db,op.col,op.id),op.data,{merge:true});}
+      else if(op.type==='delete'){await deleteDoc(doc(db,op.col,op.id));}
+    }catch(e){failed.push(op);}
+  }
+  saveQueue(failed);
+  if(failed.length) console.log('Sync parcial:',failed.length,'pendentes');
+}
+
 function startListeners(){
   if(unsubMembers) unsubMembers();
   if(unsubPending) unsubPending();
   unsubMembers = onSnapshot(collection(db,'membros'), snap => {
     members = snap.docs.map(d=>{const data=d.data();delete data.id;return{id:d.id,...data};});
+    saveLocalCache();
     if(document.getElementById('admin-section').style.display!=='none') renderAdmin();
   });
   unsubPending = onSnapshot(collection(db,'pendentes'), snap => {
     pending = snap.docs.map(d=>{const data=d.data();delete data.id;return{id:d.id,...data};});
+    saveLocalCache();
     if(document.getElementById('admin-section').style.display!=='none') renderAdmin();
   });
+  // Sincroniza operações feitas offline
+  syncQueue();
 }
+
+function isOnline(){ return navigator.onLine; }
 
 function setDbStatus(ok, msg=''){
   const el = document.getElementById('db-status');
   if(!el) return;
   el.style.display = 'block';
-  el.innerHTML = `<div class="cfg-status"><div class="dot ${ok?'ok':'err'}"></div><span style="color:${ok?'#2e7d32':'#c62828'}">${ok?'Firebase conectado — dados em tempo real':'Erro na conexão: '+msg}</span></div>`;
+  const q=getQueue();
+  const pendMsg = q.length>0 ? ` (${q.length} alteração${q.length>1?'ões':''} aguardando sincronização)` : '';
+  el.innerHTML = `<div class="cfg-status"><div class="dot ${ok?'ok':isOnline()?'err':'wait'}"></div><span style="color:${ok?'#2e7d32':isOnline()?'#c62828':'#e65100'}">${ok?'Firebase conectado — dados em tempo real'+pendMsg:isOnline()?'Erro na conexão: '+msg:'Offline — exibindo dados salvos localmente'+pendMsg}</span></div>`;
 }
 
-// ─── CRUD ──────────────────────────────────────────────────────────────────
+// Detecta mudança de conexão
+window.addEventListener('online', async()=>{
+  const cfg=loadConfig()||FIREBASE_DEFAULT;
+  if(!db){ await connectFirebase(cfg); }
+  else{ await syncQueue(); setDbStatus(true); }
+});
+window.addEventListener('offline', ()=>{ setDbStatus(false,''); });
+
+// ─── CRUD (offline-first) ─────────────────────────────────────────────────
 async function addMember(data){
-  if(!db) return fallbackAdd('membros', data);
   const clean={...data};delete clean.id;
-  await addDoc(collection(db,'membros'), clean);
+  if(db&&isOnline()){ await addDoc(collection(db,'membros'),clean); return; }
+  const id='local_'+Date.now(); members.push({id,...clean}); saveLocalCache();
+  addToQueue({type:'add',col:'membros',data:clean}); renderAdmin();
 }
 async function updateMember(id, data){
-  if(!db) return fallbackUpdate('membros', id, data);
-  await setDoc(doc(db,'membros',id), data, {merge:true});
+  if(db&&isOnline()){ await setDoc(doc(db,'membros',id),data,{merge:true}); return; }
+  const i=members.findIndex(m=>m.id===id); if(i>-1)members[i]={...members[i],...data};
+  saveLocalCache(); addToQueue({type:'update',col:'membros',id,data}); renderAdmin();
 }
 async function removeMember(id){
-  if(!db) return fallbackRemove('membros', id);
-  await deleteDoc(doc(db,'membros',id));
+  if(db&&isOnline()){ await deleteDoc(doc(db,'membros',id)); return; }
+  members=members.filter(m=>m.id!==id); saveLocalCache();
+  if(!id.startsWith('local_')) addToQueue({type:'delete',col:'membros',id}); renderAdmin();
 }
 async function addPending(data){
-  if(!db) return fallbackAdd('pendentes', data);
   const clean={...data};delete clean.id;
-  await addDoc(collection(db,'pendentes'), clean);
+  if(db&&isOnline()){ await addDoc(collection(db,'pendentes'),clean); return; }
+  const id='local_'+Date.now(); pending.push({id,...clean}); saveLocalCache();
+  addToQueue({type:'add',col:'pendentes',data:clean}); 
 }
 async function removePending(id){
-  if(!db) return fallbackRemove('pendentes', id);
-  await deleteDoc(doc(db,'pendentes',id));
+  if(db&&isOnline()){ await deleteDoc(doc(db,'pendentes',id)); return; }
+  pending=pending.filter(m=>m.id!==id); saveLocalCache();
+  if(!id.startsWith('local_')) addToQueue({type:'delete',col:'pendentes',id});
 }
 async function approvePending(id){
-  const m = pending.find(x=>x.id===id); if(!m) return;
-  const {_pendente,_enviadoEm,...clean} = m;
-  await addMember(clean);
-  await removePending(id);
+  const m=pending.find(x=>x.id===id); if(!m) return;
+  const {_pendente,_enviadoEm,...clean}=m;
+  await addMember(clean); await removePending(id);
 }
 
-// fallback localStorage se sem firebase
+// fallback antigo (compatibilidade)
 const LS_M='nvc_membros', LS_P='nvc_pend';
-function fallbackLoad(){
-  try{members=JSON.parse(localStorage.getItem(LS_M)||'[]');}catch(e){members=[];}
-  try{pending=JSON.parse(localStorage.getItem(LS_P)||'[]');}catch(e){pending=[];}
-}
-function fallbackSave(){
-  localStorage.setItem(LS_M,JSON.stringify(members));
-  localStorage.setItem(LS_P,JSON.stringify(pending));
-}
-function fallbackAdd(col,data){ const id=String(Date.now()); if(col==='membros'){members.push({id,...data});}else{pending.push({id,...data});} fallbackSave(); renderAdmin(); }
-function fallbackUpdate(col,id,data){ if(col==='membros'){const i=members.findIndex(m=>m.id===id);if(i>-1)members[i]={...members[i],...data};} fallbackSave(); renderAdmin(); }
-function fallbackRemove(col,id){ if(col==='membros'){members=members.filter(m=>m.id!==id);}else{pending=pending.filter(m=>m.id!==id);} fallbackSave(); renderAdmin(); }
+function fallbackLoad(){ loadLocalCache(); }
+function fallbackSave(){ saveLocalCache(); }
+function fallbackAdd(col,data){ const id=String(Date.now()); if(col==='membros'){members.push({id,...data});}else{pending.push({id,...data});} saveLocalCache(); renderAdmin(); }
+function fallbackUpdate(col,id,data){ if(col==='membros'){const i=members.findIndex(m=>m.id===id);if(i>-1)members[i]={...members[i],...data};} saveLocalCache(); renderAdmin(); }
+function fallbackRemove(col,id){ if(col==='membros'){members=members.filter(m=>m.id!==id);}else{pending=pending.filter(m=>m.id!==id);} saveLocalCache(); renderAdmin(); }
 
 // ─── UTILITÁRIOS ──────────────────────────────────────────────────────────
 function fmt(d){if(!d)return'—';const[y,m,dia]=d.split('-');return`${dia}/${m}/${y}`;}
@@ -441,7 +487,7 @@ window.showAdmin=()=>{
   document.getElementById('lock-section').style.display='none';
   document.getElementById('admin-section').style.display='block';
   document.getElementById('config-section').style.display='none';
-  if(!db){ fallbackLoad(); setDbStatus(false,'Firebase não configurado. Usando armazenamento local.'); }
+  if(!db){ loadLocalCache(); setDbStatus(false, isOnline()?'Firebase não configurado':''); } else { setDbStatus(true); }
   renderAdmin();
 };
 window.showConfig=()=>{
